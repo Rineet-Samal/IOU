@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · IOU{% endblock %}
+{% block content %}
+<div class="home-wrapper">
+  <nav class="navbar">
+    <div class="brand-logo small">
+      <span class="brand-icon">🪙</span>
+      <span class="brand-name">IOU</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-user">Hey, {{ username }} 👋</span>
+      <a href="{{ url_for('logout') }}" class="btn-outline">Log Out</a>
+    </div>
+  </nav>
+
+  <main class="home-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="hero-banner">
+      <div class="hero-text">
+        <h1>Your money, sorted 💫</h1>
+        <p>No more chasing friends for chai money.</p>
+      </div>
+      <div class="hero-net {{ 'positive' if net >= 0 else 'negative' }}">
+        <span class="hero-net-label">Net balance</span>
+        <span class="hero-net-value">₹{{ '%.2f'|format(net) }}</span>
+      </div>
+    </section>
+
+    <section class="stat-grid">
+      <div class="stat-card stat-red">
+        <span class="stat-emoji">😬</span>
+        <span class="stat-label">You owe</span>
+        <span class="stat-value">₹{{ '%.2f'|format(total_owed) }}</span>
+      </div>
+      <div class="stat-card stat-green">
+        <span class="stat-emoji">🤑</span>
+        <span class="stat-label">You'll receive</span>
+        <span class="stat-value">₹{{ '%.2f'|format(total_due) }}</span>
+      </div>
+      <div class="stat-card stat-purple">
+        <span class="stat-emoji">🧾</span>
+        <span class="stat-label">Total IOUs</span>
+        <span class="stat-value">{{ expenses|length }}</span>
+      </div>
+    </section>
+
+    <section class="card add-expense-card">
+      <h2 class="card-title">➕ Add an Expense</h2>
+      <form method="POST" action="{{ url_for('add_expense') }}" class="expense-form">
+        <div class="field">
+          <label for="direction">Type</label>
+          <select id="direction" name="direction" required>
+            <option value="owe">💸 I owe money</option>
+            <option value="receive">💰 I receive money</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="counterparty">Username</label>
+          <input type="text" id="counterparty" name="counterparty"
+                 placeholder="e.g. rahul_22" required />
+        </div>
+
+        <div class="field">
+          <label for="amount">Amount (₹)</label>
+          <input type="number" id="amount" name="amount" step="0.01"
+                 min="0.01" placeholder="0.00" required />
+        </div>
+
+        <button type="submit" class="btn-primary btn-inline">Submit</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">📋 Activity</h2>
+      {% if expenses %}
+        <ul class="expense-list">
+          {% for e in expenses %}
+            <li class="expense-item">
+              <div class="expense-avatar">{{ e.counterparty[0]|upper }}</div>
+              <div class="expense-info">
+                <span class="expense-name">{{ e.counterparty }}</span>
+                <span class="expense-date">{{ e.created_at.replace('T', ' ') }}</span>
+              </div>
+              <span class="badge badge-{{ 'red' if e.direction == 'owe' else 'green' }}">
+                {{ 'You owe' if e.direction == 'owe' else 'Owes you' }}
+              </span>
+              <span class="expense-amount {{ 'amt-red' if e.direction == 'owe' else 'amt-green' }}">
+                {{ '-' if e.direction == 'owe' else '+' }}₹{{ '%.2f'|format(e.amount) }}
+              </span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <span class="empty-icon">🧾</span>
+          <h3>No IOUs yet</h3>
+          <p>Add your first expense above to get started.</p>
+        </div>
+      {% endif %}
+    </section>
+  </main>
+</div>
+{% endblock %}
