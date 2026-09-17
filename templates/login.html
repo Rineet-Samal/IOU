@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Log In · IOU{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+  <div class="brand-side">
+    <div class="brand-logo">
+      <span class="brand-icon">🪙</span>
+      <span class="brand-name">IOU</span>
+    </div>
+    <p class="brand-tagline">Split smart. Settle fast.</p>
+    <p class="brand-sub">Track shared expenses with roommates, trips, and squads &mdash; no more awkward "you owe me" texts.</p>
+    <ul class="brand-points">
+      <li>💸 Track who owes who, instantly</li>
+      <li>🧾 Split bills in seconds</li>
+      <li>🎓 Built for college life</li>
+    </ul>
+  </div>
+
+  <div class="form-side">
+    <div class="auth-card">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-subtitle">Log in to keep track of your IOUs</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="e.g. jamie_23" required autofocus />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+        <button type="submit" class="btn-primary">Log In</button>
+      </form>
+
+      <p class="auth-footer">
+        New to IOU? <a href="{{ url_for('signup') }}">Create an account</a>
+      </p>
+    </div>
+    <p class="footer-note">Developed by Rin8</p>
+  </div>
+</div>
+{% endblock %}
